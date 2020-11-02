@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <termios.h>
-
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 
