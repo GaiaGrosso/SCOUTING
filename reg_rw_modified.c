@@ -32,8 +32,13 @@
 #define MAP_SIZE (32*1024UL)
 #define MAP_MASK (MAP_SIZE - 1)
 
-
+// New functions declaration:
 void write_bits(char *device_loc, char *address, char *width, unsigned int writeval);
+unsigned int read_bits(char *device_loc, char *address, char *width);
+void printBits(unsigned int num);
+unsigned int modifyBit(unsigned int x, unsigned char position, bool newState);
+
+
 void write_bits(char *device_loc, char *address, char *width, unsigned int writeval)
 {
   int fd;
@@ -46,7 +51,6 @@ void write_bits(char *device_loc, char *address, char *width, unsigned int write
   printf("device: %s\n", device);
   target = strtoul(address, 0, 0);
   printf("address: 0x%08x\n", (unsigned int)target);
-
   printf("access width: ");
   if (access_width == 'b')
     printf("byte (8-bits)\n");
@@ -58,12 +62,10 @@ void write_bits(char *device_loc, char *address, char *width, unsigned int write
     printf("word (32-bits)\n");
     access_width = 'w';
   }
-
   if ((fd = open(device_loc, O_RDWR | O_SYNC)) == -1)
     FATAL;
   printf("character device %s opened.\n", device_loc);
   fflush(stdout);
-
   /* map one page */
   map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (map_base == (void *)-1)
@@ -112,7 +114,6 @@ void write_bits(char *device_loc, char *address, char *width, unsigned int write
   fflush(stdout);
 };
 
-unsigned int read_bits(char *device_loc, char *address, char *width);
 unsigned int read_bits(char *device_loc, char *address, char *width)
 {
   uint32_t read_result;
@@ -138,7 +139,6 @@ unsigned int read_bits(char *device_loc, char *address, char *width)
     printf("word (32-bits)\n");
     access_width = 'w';
   }
-
   if ((fd = open(device_loc, O_RDWR | O_SYNC)) == -1)
     FATAL;
   printf("character device %s opened.\n", device_loc);
@@ -189,7 +189,7 @@ unsigned int read_bits(char *device_loc, char *address, char *width)
   return (unsigned int)read_result;
 };
 
-void printBits(unsigned int num);
+
 void printBits(unsigned int num){
   unsigned int size = sizeof(unsigned int);
   unsigned int maxPow = 1<<(size*8-1);
@@ -202,17 +202,32 @@ void printBits(unsigned int num){
   fflush(stdout);
 };
 
+unsigned int modifyBit(unsigned int x, unsigned char position, bool newState)
+{
+  printf("Position: ");
+  printf("%02x", position);
+  printf("\n");
+  printf("New state: ");
+  if(newState)
+    printf("yes \n");
+  else
+    printf("no \n");
+  fflush(stdout);
+  int mask = 1 << position;
+  int state = newState; // relies on true = 1 and false = 0                                                                                                       
+  return (x & ~mask) | (-state & mask);
+};
 
 int main(int argc, char **argv)
 {
   /* not enough arguments given? */
   if (argc < 3) {
     fprintf(stderr,
-	    "\nUsage:\t%s <device> <address> [[type] data]\n"
-	    "\tdevice  : character device to access\n"
-	    "\taddress : memory address to access\n"
-	    "\ttype    : access operation type : [b]yte, [h]alfword, [w]ord\n",
-	    argv[0]);
+            "\nUsage:\t%s <device> <address> [[type] data]\n"
+            "\tdevice  : character device to access\n"
+            "\taddress : memory address to access\n"
+            "\ttype    : access operation type : [b]yte, [h]alfword, [w]ord\n",
+            argv[0]);
     exit(1);
   }
 
@@ -227,10 +242,9 @@ int main(int argc, char **argv)
   printBits(read_result);
   printf("\n");
   fflush(stdout);
-  unsigned int writeval = read_result*2; // add non trivial bits modification here
-  printf("writeval: ");
-  //printf(writeval);
-  //printf("\n");
+  unsigned char position = 4;
+  unsigned int writeval = modifyBit(read_result, position, true); // add non trivial bits modification here                                                       
+  printf("writeval: ");                                                                                                                                                 
   printBits(writeval);
   printf("\n");
   write_bits(device, address, width, writeval);
