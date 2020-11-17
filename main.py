@@ -29,7 +29,7 @@ config_dict = {
 
             "property1" : {
                 "location": "0x00000001",
-                "bitmask" : "00000000000000000000000000001110"
+                "bitmask" : "00000000000000000000000000001111"
             }
         }
     }
@@ -64,7 +64,6 @@ def WriteProperty(device, location, string_mask, write_value):
     list_32read   = [int(bit) for bit in string_read]
     list_32mask   = [int(bit) for bit in string_mask]
     list_32write  = [int(bit) for bit in string_write]
-    #selected_bits = np.where(list_32mask>0, )                                                                                                               
     list_32out    = []
     j=0
     for i in range(32):
@@ -96,12 +95,13 @@ def NBitsNeeded(value): #string of bits
         output -= 1
         i+=1
     print("Number of required bits: %i"%(output))
+    if output == 0:
+        # 1 bit needed to store 0
+        output +=1
     return output
 
 if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()    #Python tool that makes it easy to create an user-friendly command-line interface                                 \
-                                                                                                                                                             
+    parser = argparse.ArgumentParser()    #Python tool that makes it easy to create an user-friendly command-line interface                                                                                                                                                                                   
     parser.add_argument('-b','--board',    type=str, help="scouting board",   required=True)
     parser.add_argument('-a','--action',   type=str, help="control action",   required=True, choices=actions)
     parser.add_argument('-p','--property', type=str, help="control property", required=True)
