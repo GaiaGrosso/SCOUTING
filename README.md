@@ -14,6 +14,9 @@
             
 - functions.c : C functions to read/write in the board using AXI-lite from Xilinx (https://github.com/Xilinx/dma_ip_drivers/tree/master/XDMA/linux-kernel)
             
-            before running build the shared library by doing:
+### set up:
+ - download https://github.com/Xilinx/dma_ip_drivers/
+ - copy functions.c in /dma_ip_drivers-master/XDMA/linux-kernel/tools
+ - build the shared library:
             
             cc -fPIC -shared -o functions.so functions.c
