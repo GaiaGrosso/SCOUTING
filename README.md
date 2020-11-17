@@ -31,3 +31,6 @@
 - run main.py
 
             main.py -b [board_name] -a [set/get] -p [property_name] (-v [new_value])
+
+## To Do:
+- Configuration file (json): convert the dictionary in main.py into a json file
