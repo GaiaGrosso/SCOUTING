@@ -16,7 +16,18 @@
             
 ### set up:
  - download https://github.com/Xilinx/dma_ip_drivers/
- - copy functions.c in /dma_ip_drivers-master/XDMA/linux-kernel/tools
- - build the shared library:
+ - add functions.c:
             
+            cd $HOME/dma_ip_drivers-master/XDMA/linux-kernel/
+            git clone https://github.com/GaiaGrosso/SCOUTING/ 
+            
+ - if the driver is not installed follow the instruction to install the Xlinx driver
+            
+ - build the shared library:
+           
+            cd $HOME/dma_ip_drivers-master/XDMA/linux-kernel/SCOUTING
             cc -fPIC -shared -o functions.so functions.c
+
+- run main.py
+
+            main.py -b [board_name] -a [set/get] -p [property_name] (-v [new_value])
